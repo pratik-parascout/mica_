@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="bg-gray-100">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-lg">
+        <div class="max-w-6xl mx-auto px-4">
+            <div class="flex justify-between">
+                <div class="flex space-x-7">
+                    <div>
+                        <a href="/" class="flex items-center py-4">
+                            <span class="font-semibold text-gray-500 text-lg">MICA</span>
+                        </a>
+                    </div>
+                    <div class="hidden md:flex items-center space-x-1">
+                        <a href="/" class="py-4 px-2 <%= path === '/' ? 'text-green-500 border-b-4 border-green-500 font-semibold' : 'text-gray-500 font-semibold hover:text-green-500 transition duration-300' %>">Home</a>
+                        <a href="/products" class="py-4 px-2 <%= path === '/products' ? 'text-green-500 border-b-4 border-green-500 font-semibold' : 'text-gray-500 font-semibold hover:text-green-500 transition duration-300' %>">Products</a>
+                        <a href="/contact" class="py-4 px-2 <%= path === '/contact' ? 'text-green-500 border-b-4 border-green-500 font-semibold' : 'text-gray-500 font-semibold hover:text-green-500 transition duration-300' %>">Contact</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>

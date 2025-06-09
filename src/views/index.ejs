@@ -1,0 +1,38 @@
+<%- include('layouts/header', {path: '/'}) %>
+
+<!-- Hero Section -->
+<div class="bg-green-500 text-white">
+    <div class="container mx-auto px-4 py-16 flex flex-col md:flex-row items-center">
+        <div class="md:w-1/2 mb-8 md:mb-0">
+            <h1 class="text-4xl md:text-5xl font-bold mb-4">Welcome to MICA</h1>
+            <p class="text-xl mb-6">Discover our premium quality products designed for your needs.</p>
+            <a href="/products" class="bg-white text-green-500 px-6 py-3 rounded-lg font-semibold hover:bg-gray-100 transition duration-300">
+                View Products
+            </a>
+        </div>
+        <div class="md:w-1/2 flex justify-center">
+            <div class="w-full max-w-md h-64 bg-white rounded-lg shadow-lg"></div>
+        </div>
+    </div>
+</div>
+
+<!-- Features Section -->
+<div class="container mx-auto px-4 py-16">
+    <h2 class="text-3xl font-bold text-center text-gray-900 mb-12">Why Choose MICA?</h2>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div class="bg-white p-6 rounded-lg shadow-md">
+            <h3 class="text-xl font-semibold text-gray-900 mb-4">Quality Products</h3>
+            <p class="text-gray-600">We offer only the highest quality products that are built to last.</p>
+        </div>
+        <div class="bg-white p-6 rounded-lg shadow-md">
+            <h3 class="text-xl font-semibold text-gray-900 mb-4">Customer Support</h3>
+            <p class="text-gray-600">Our team is always ready to assist you with any questions or concerns.</p>
+        </div>
+        <div class="bg-white p-6 rounded-lg shadow-md">
+            <h3 class="text-xl font-semibold text-gray-900 mb-4">Fast Delivery</h3>
+            <p class="text-gray-600">We ensure quick and reliable delivery of all our products.</p>
+        </div>
+    </div>
+</div>
+
+<%- include('layouts/footer') %>

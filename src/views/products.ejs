@@ -1,0 +1,36 @@
+<%- include('layouts/header', {path: '/products'}) %>
+
+<!-- Products Section -->
+<div class="container mx-auto px-4 py-8">
+    <h2 class="text-3xl font-bold text-gray-900 mb-8">Our Products</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <% products.forEach(product => { %>
+            <div class="bg-white rounded-lg shadow-md overflow-hidden">
+                <img src="<%= product.image %>" alt="<%= product.name %>" class="w-full h-48 object-cover">
+                <div class="p-4">
+                    <h3 class="text-lg font-semibold text-gray-900"><%= product.name %></h3>
+                    <p class="mt-2 text-gray-600"><%= product.description || '' %></p>
+                    <button onclick="selectProduct('<%= product._id %>', '<%= product.name %>')" 
+                            class="mt-4 w-full bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">
+                        Inquire About This Product
+                    </button>
+                </div>
+            </div>
+        <% }); %>
+    </div>
+</div>
+
+<script>
+    function selectProduct(productId, productName) {
+        // Store selected product in session storage
+        sessionStorage.setItem('selectedProduct', JSON.stringify({
+            id: productId,
+            name: productName
+        }));
+        
+        // Redirect to contact form
+        window.location.href = '/contact';
+    }
+</script>
+
+<%- include('layouts/footer') %>

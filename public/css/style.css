@@ -1,0 +1,40 @@
+/* Custom styles for MICA website */
+
+/* Add any custom styles here that extend Tailwind CSS */
+
+/* For example, you might want to add custom animations or styles that aren't easily done with Tailwind */
+
+/* Custom focus styles */
+.custom-focus:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(72, 187, 120, 0.5);
+}
+
+/* Custom scrollbar for webkit browsers */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+/* Ensure footer stays at bottom for short pages */
+body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+main {
+  flex: 1;
+}
