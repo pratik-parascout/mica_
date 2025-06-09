@@ -14,12 +14,12 @@ class ProductController {
       const products = await productService.getAllProducts();
       res.status(200).json({
         success: true,
-        data: products
+        data: products,
       });
     } catch (error) {
       res.status(500).json({
         success: false,
-        message: 'Server Error'
+        message: 'Server Error',
       });
     }
   }
@@ -32,22 +32,22 @@ class ProductController {
   async getProduct(req, res) {
     try {
       const product = await productService.getProductById(req.params.id);
-      
+
       if (!product) {
         return res.status(404).json({
           success: false,
-          message: 'Product not found'
+          message: 'Product not found',
         });
       }
 
       res.status(200).json({
         success: true,
-        data: product
+        data: product,
       });
     } catch (error) {
       res.status(500).json({
         success: false,
-        message: 'Server Error'
+        message: 'Server Error',
       });
     }
   }
@@ -63,7 +63,7 @@ class ProductController {
 
       res.status(201).json({
         success: true,
-        data: product
+        data: product,
       });
     } catch (error) {
       // Clean up uploaded file if product creation fails
@@ -71,7 +71,7 @@ class ProductController {
 
       res.status(error.message === 'Please upload an image' ? 400 : 500).json({
         success: false,
-        message: error.message || 'Server Error'
+        message: error.message || 'Server Error',
       });
     }
   }
@@ -83,11 +83,15 @@ class ProductController {
    */
   async updateProduct(req, res) {
     try {
-      const product = await productService.updateProduct(req.params.id, req.body, req.file);
+      const product = await productService.updateProduct(
+        req.params.id,
+        req.body,
+        req.file
+      );
 
       res.status(200).json({
         success: true,
-        data: product
+        data: product,
       });
     } catch (error) {
       // Clean up uploaded file if product update fails
@@ -95,7 +99,7 @@ class ProductController {
 
       res.status(error.message === 'Product not found' ? 404 : 500).json({
         success: false,
-        message: error.message || 'Server Error'
+        message: error.message || 'Server Error',
       });
     }
   }
@@ -111,12 +115,12 @@ class ProductController {
 
       res.status(200).json({
         success: true,
-        message: 'Product deleted successfully'
+        message: 'Product deleted successfully',
       });
     } catch (error) {
       res.status(error.message === 'Product not found' ? 404 : 500).json({
         success: false,
-        message: error.message || 'Server Error'
+        message: error.message || 'Server Error',
       });
     }
   }

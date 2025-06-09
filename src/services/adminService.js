@@ -16,14 +16,14 @@ class AdminService {
   async login(email, password) {
     // Check if admin exists
     const admin = await Admin.findOne({ email }).select('+password');
-    
+
     if (!admin) {
       throw new Error('Invalid credentials');
     }
 
     // Check if password matches
     const isMatch = await bcrypt.compare(password, admin.password);
-    
+
     if (!isMatch) {
       throw new Error('Invalid credentials');
     }
@@ -38,7 +38,7 @@ class AdminService {
    */
   generateToken(id) {
     return jwt.sign({ id }, process.env.JWT_SECRET, {
-      expiresIn: process.env.JWT_EXPIRE
+      expiresIn: process.env.JWT_EXPIRE,
     });
   }
 
@@ -58,25 +58,25 @@ class AdminService {
    */
   async forgotPassword(email) {
     const admin = await Admin.findOne({ email });
-    
+
     if (!admin) {
       throw new Error('Admin not found');
     }
 
     // Generate reset token
     const resetToken = crypto.randomBytes(20).toString('hex');
-    
+
     // Hash token and set to resetPasswordToken field
     admin.resetPasswordToken = crypto
       .createHash('sha256')
       .update(resetToken)
       .digest('hex');
-    
+
     // Set expire
     admin.resetPasswordExpire = Date.now() + 10 * 60 * 1000; // 10 minutes
-    
+
     await admin.save();
-    
+
     return resetToken;
   }
 
@@ -92,23 +92,23 @@ class AdminService {
       .createHash('sha256')
       .update(resetToken)
       .digest('hex');
-    
+
     const admin = await Admin.findOne({
       resetPasswordToken,
-      resetPasswordExpire: { $gt: Date.now() }
+      resetPasswordExpire: { $gt: Date.now() },
     });
-    
+
     if (!admin) {
       throw new Error('Invalid token');
     }
-    
-    // Set new password
+
+    // Set new password (will be hashed by pre-save hook)
     admin.password = password;
     admin.resetPasswordToken = undefined;
     admin.resetPasswordExpire = undefined;
-    
+
     await admin.save();
-    
+
     return true;
   }
 }

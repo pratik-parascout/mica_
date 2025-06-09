@@ -11,22 +11,57 @@ class ContactController {
    */
   async submitContact(req, res) {
     try {
-      const contact = await contactService.createContact({
+      console.log('Contact form submission received:', req.body);
+
+      // Map productId and productName to arrays as expected by the model
+      const contactData = {
         name: req.body.name,
         email: req.body.email,
-        message: req.body.message,
-        productId: req.body.productId,
-        productName: req.body.productName
-      });
+        phone: req.body.phone,
+        message: req.body.message || '',
+      };
+
+      // Handle single or multiple products
+      if (
+        Array.isArray(req.body.productIds) &&
+        req.body.productIds.length > 0
+      ) {
+        contactData.productIds = req.body.productIds;
+      } else if (
+        req.body.productId &&
+        req.body.productId !== 'undefined' &&
+        req.body.productId !== ''
+      ) {
+        contactData.productIds = [req.body.productId];
+      }
+
+      if (
+        Array.isArray(req.body.productNames) &&
+        req.body.productNames.length > 0
+      ) {
+        contactData.productNames = req.body.productNames;
+      } else if (
+        req.body.productName &&
+        req.body.productName !== 'undefined' &&
+        req.body.productName !== ''
+      ) {
+        contactData.productNames = [req.body.productName];
+      }
+
+      console.log('Processed contact data:', contactData);
+
+      const contact = await contactService.createContact(contactData);
+      console.log('Contact created:', contact);
 
       res.status(201).json({
         success: true,
-        data: contact
+        data: contact,
       });
     } catch (error) {
+      console.error('Contact submission error:', error);
       res.status(500).json({
         success: false,
-        message: 'Server Error'
+        message: error.message || 'Server Error',
       });
     }
   }
@@ -39,15 +74,15 @@ class ContactController {
   async getContacts(req, res) {
     try {
       const contacts = await contactService.getAllContacts();
-      
+
       res.status(200).json({
         success: true,
-        data: contacts
+        data: contacts,
       });
     } catch (error) {
       res.status(500).json({
         success: false,
-        message: 'Server Error'
+        message: 'Server Error',
       });
     }
   }
@@ -60,22 +95,22 @@ class ContactController {
   async getContact(req, res) {
     try {
       const contact = await contactService.getContactById(req.params.id);
-      
+
       if (!contact) {
         return res.status(404).json({
           success: false,
-          message: 'Contact not found'
+          message: 'Contact not found',
         });
       }
 
       res.status(200).json({
         success: true,
-        data: contact
+        data: contact,
       });
     } catch (error) {
       res.status(500).json({
         success: false,
-        message: 'Server Error'
+        message: 'Server Error',
       });
     }
   }
@@ -91,12 +126,12 @@ class ContactController {
 
       res.status(200).json({
         success: true,
-        message: 'Contact deleted successfully'
+        message: 'Contact deleted successfully',
       });
     } catch (error) {
       res.status(error.message === 'Contact not found' ? 404 : 500).json({
         success: false,
-        message: error.message || 'Server Error'
+        message: error.message || 'Server Error',
       });
     }
   }

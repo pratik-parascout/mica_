@@ -1,38 +1,79 @@
 <%- include('layouts/header', {path: '/'}) %>
 
 <!-- Hero Section -->
-<div class="bg-green-500 text-white">
-    <div class="container mx-auto px-4 py-16 flex flex-col md:flex-row items-center">
-        <div class="md:w-1/2 mb-8 md:mb-0">
-            <h1 class="text-4xl md:text-5xl font-bold mb-4">Welcome to MICA</h1>
-            <p class="text-xl mb-6">Discover our premium quality products designed for your needs.</p>
-            <a href="/products" class="bg-white text-green-500 px-6 py-3 rounded-lg font-semibold hover:bg-gray-100 transition duration-300">
-                View Products
-            </a>
-        </div>
-        <div class="md:w-1/2 flex justify-center">
-            <div class="w-full max-w-md h-64 bg-white rounded-lg shadow-lg"></div>
-        </div>
+<div
+  class="relative bg-gradient-to-r from-green-100 via-yellow-100 to-gray-200 py-16 mb-8"
+>
+  <div class="container mx-auto flex flex-col md:flex-row items-center px-4">
+    <div class="md:w-1/2 mb-8 md:mb-0">
+      <h1 class="text-5xl font-bold text-gray-900 mb-4">
+        Welcome to MICA Stone Traders
+      </h1>
+      <p class="text-xl text-gray-700 mb-6">
+        Supplying premium mica stones for industrial, decorative, and scientific
+        use. Explore our stock and contact us for a quote—no prices listed
+        online.
+      </p>
+      <a
+        href="/products"
+        class="bg-green-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-green-700 transition duration-300 shadow"
+      >
+        View Our Stock
+      </a>
     </div>
+    <div class="md:w-1/2 flex justify-center">
+      <img
+        src="https://images.unsplash.com/photo-1464983953574-0892a716854b?auto=format&fit=crop&w=400&q=80"
+        alt="Mica Stone"
+        class="rounded-lg shadow-lg w-96 h-72 object-cover border-4 border-green-200"
+      />
+    </div>
+  </div>
 </div>
 
 <!-- Features Section -->
 <div class="container mx-auto px-4 py-16">
-    <h2 class="text-3xl font-bold text-center text-gray-900 mb-12">Why Choose MICA?</h2>
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-        <div class="bg-white p-6 rounded-lg shadow-md">
-            <h3 class="text-xl font-semibold text-gray-900 mb-4">Quality Products</h3>
-            <p class="text-gray-600">We offer only the highest quality products that are built to last.</p>
-        </div>
-        <div class="bg-white p-6 rounded-lg shadow-md">
-            <h3 class="text-xl font-semibold text-gray-900 mb-4">Customer Support</h3>
-            <p class="text-gray-600">Our team is always ready to assist you with any questions or concerns.</p>
-        </div>
-        <div class="bg-white p-6 rounded-lg shadow-md">
-            <h3 class="text-xl font-semibold text-gray-900 mb-4">Fast Delivery</h3>
-            <p class="text-gray-600">We ensure quick and reliable delivery of all our products.</p>
-        </div>
+  <h2 class="text-3xl font-bold text-center text-gray-900 mb-12">
+    Why Choose MICA?
+  </h2>
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+    <div class="bg-white p-6 rounded-lg shadow-md flex flex-col items-center">
+      <img
+        src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=80&q=80"
+        alt="Quality"
+        class="w-20 h-20 rounded-full mb-4 border-4 border-green-200 object-cover"
+      />
+      <h3 class="text-xl font-semibold text-gray-900 mb-2">Premium Quality</h3>
+      <p class="text-gray-600 text-center">
+        Our mica stones are hand-selected for purity and consistency, ideal for
+        all applications.
+      </p>
     </div>
+    <div class="bg-white p-6 rounded-lg shadow-md flex flex-col items-center">
+      <img
+        src="https://images.unsplash.com/photo-1519125323398-675f0ddb6308?auto=format&fit=crop&w=80&q=80"
+        alt="Support"
+        class="w-20 h-20 rounded-full mb-4 border-4 border-green-200 object-cover"
+      />
+      <h3 class="text-xl font-semibold text-gray-900 mb-2">Expert Support</h3>
+      <p class="text-gray-600 text-center">
+        Our team provides expert advice and fast responses for all your mica
+        stone inquiries.
+      </p>
+    </div>
+    <div class="bg-white p-6 rounded-lg shadow-md flex flex-col items-center">
+      <img
+        src="https://images.unsplash.com/photo-1465101046530-73398c7f28ca?auto=format&fit=crop&w=80&q=80"
+        alt="Delivery"
+        class="w-20 h-20 rounded-full mb-4 border-4 border-green-200 object-cover"
+      />
+      <h3 class="text-xl font-semibold text-gray-900 mb-2">Global Delivery</h3>
+      <p class="text-gray-600 text-center">
+        We ship mica stones worldwide, ensuring safe and timely delivery to your
+        location.
+      </p>
+    </div>
+  </div>
 </div>
 
 <%- include('layouts/footer') %>

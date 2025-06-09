@@ -10,6 +10,13 @@ class ContactService {
    * @returns {Promise<Object>} Created contact
    */
   async createContact(contactData) {
+    // Ensure productIds and productNames are arrays
+    if (contactData.productIds && !Array.isArray(contactData.productIds)) {
+      contactData.productIds = [contactData.productIds];
+    }
+    if (contactData.productNames && !Array.isArray(contactData.productNames)) {
+      contactData.productNames = [contactData.productNames];
+    }
     return await Contact.create(contactData);
   }
 

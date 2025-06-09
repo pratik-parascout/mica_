@@ -30,7 +30,7 @@ const configureExpress = (app) => {
     console.error(err.stack);
     res.status(500).json({
       success: false,
-      message: 'Something went wrong!'
+      message: 'Something went wrong!',
     });
   });
 

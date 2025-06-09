@@ -15,7 +15,7 @@ const validationRules = {
       .withMessage('Please provide a valid email'),
     body('password')
       .isLength({ min: 6 })
-      .withMessage('Password must be at least 6 characters long')
+      .withMessage('Password must be at least 6 characters long'),
   ],
 
   // Product validation
@@ -42,7 +42,7 @@ const validationRules = {
     body('specifications')
       .optional()
       .isObject()
-      .withMessage('Specifications must be a valid object')
+      .withMessage('Specifications must be a valid object'),
   ],
 
   updateProduct: [
@@ -69,7 +69,7 @@ const validationRules = {
     body('stock')
       .optional()
       .isInt({ min: 0 })
-      .withMessage('Stock must be a non-negative integer')
+      .withMessage('Stock must be a non-negative integer'),
   ],
 
   // Contact validation
@@ -87,12 +87,26 @@ const validationRules = {
       .withMessage('Please provide a valid phone number'),
     body('message')
       .trim()
-      .isLength({ min: 10, max: 1000 })
-      .withMessage('Message must be between 10 and 1000 characters'),
-    body('productId')
+      .isLength({ min: 0, max: 1000 })
+      .withMessage('Message must not exceed 1000 characters'),
+    // Accept either productId (single) or productIds (array)
+    body('productId').optional().isMongoId().withMessage('Invalid product ID'),
+    body('productIds')
+      .optional()
+      .isArray({ min: 1 })
+      .withMessage('productIds must be an array'),
+    body('productIds.*')
       .optional()
       .isMongoId()
-      .withMessage('Invalid product ID')
+      .withMessage('Each productId must be a valid Mongo ID'),
+    body('productNames')
+      .optional()
+      .isArray({ min: 1 })
+      .withMessage('productNames must be an array'),
+    body('productNames.*')
+      .optional()
+      .isString()
+      .withMessage('Each productName must be a string'),
   ],
 
   // Review validation
@@ -111,7 +125,7 @@ const validationRules = {
     body('reviewerEmail')
       .isEmail()
       .normalizeEmail()
-      .withMessage('Please provide a valid email')
+      .withMessage('Please provide a valid email'),
   ],
 
   // Query validation
@@ -141,8 +155,8 @@ const validationRules = {
       .optional()
       .trim()
       .isLength({ min: 2, max: 100 })
-      .withMessage('Search term must be between 2 and 100 characters')
-  ]
+      .withMessage('Search term must be between 2 and 100 characters'),
+  ],
 };
 
 // Joi schemas for complex validation
@@ -152,17 +166,17 @@ const joiSchemas = {
       length: Joi.number().positive(),
       width: Joi.number().positive(),
       height: Joi.number().positive(),
-      unit: Joi.string().valid('cm', 'inch', 'm')
+      unit: Joi.string().valid('cm', 'inch', 'm'),
     }),
     weight: Joi.object({
       value: Joi.number().positive(),
-      unit: Joi.string().valid('kg', 'g', 'lb', 'oz')
+      unit: Joi.string().valid('kg', 'g', 'lb', 'oz'),
     }),
     material: Joi.string().max(100),
     color: Joi.string().max(50),
     warranty: Joi.string().max(100),
-    features: Joi.array().items(Joi.string().max(100))
-  }).unknown(true)
+    features: Joi.array().items(Joi.string().max(100)),
+  }).unknown(true),
 };
 
 /**
@@ -174,7 +188,7 @@ const handleValidationErrors = (req, res, next) => {
     return res.status(400).json({
       success: false,
       message: 'Validation failed',
-      errors: errors.array()
+      errors: errors.array(),
     });
   }
   next();
@@ -190,10 +204,10 @@ const validateWithJoi = (schema) => {
       return res.status(400).json({
         success: false,
         message: 'Validation failed',
-        errors: error.details.map(detail => ({
+        errors: error.details.map((detail) => ({
           field: detail.path.join('.'),
-          message: detail.message
-        }))
+          message: detail.message,
+        })),
       });
     }
     next();
@@ -215,7 +229,7 @@ const sanitizeInput = (req, res, next) => {
 
   const sanitizeObject = (obj) => {
     if (typeof obj !== 'object' || obj === null) return obj;
-    
+
     const sanitized = {};
     for (const [key, value] of Object.entries(obj)) {
       if (typeof value === 'string') {
@@ -232,7 +246,7 @@ const sanitizeInput = (req, res, next) => {
   req.body = sanitizeObject(req.body);
   req.query = sanitizeObject(req.query);
   req.params = sanitizeObject(req.params);
-  
+
   next();
 };
 
@@ -241,5 +255,5 @@ module.exports = {
   joiSchemas,
   handleValidationErrors,
   validateWithJoi,
-  sanitizeInput
+  sanitizeInput,
 };

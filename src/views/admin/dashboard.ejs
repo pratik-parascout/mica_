@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><%= title %></title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="/css/style.css">
     <script>
         // Check authentication immediately
@@ -187,309 +188,332 @@
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            // Tab switching
-            const tabProducts = document.getElementById('tab-products');
-            const tabContacts = document.getElementById('tab-contacts');
-            const productsContent = document.getElementById('products-content');
-            const contactsContent = document.getElementById('contacts-content');
-            
-            tabProducts.addEventListener('click', () => {
-                productsContent.classList.remove('hidden');
-                contactsContent.classList.add('hidden');
-                tabProducts.classList.add('text-green-500', 'border-b-2', 'border-green-500');
-                tabProducts.classList.remove('text-gray-500', 'hover:text-green-500');
-                tabContacts.classList.add('text-gray-500', 'hover:text-green-500');
-                tabContacts.classList.remove('text-green-500', 'border-b-2', 'border-green-500');
-            });
-            
-            tabContacts.addEventListener('click', () => {
-                contactsContent.classList.remove('hidden');
-                productsContent.classList.add('hidden');
-                tabContacts.classList.add('text-green-500', 'border-b-2', 'border-green-500');
-                tabContacts.classList.remove('text-gray-500', 'hover:text-green-500');
-                tabProducts.classList.add('text-gray-500', 'hover:text-green-500');
-                tabProducts.classList.remove('text-green-500', 'border-b-2', 'border-green-500');
-                
-                // Load contacts when tab is clicked
-                fetchContacts();
-            });
-            
-            // Fetch products on page load
-            fetchProducts();
-            
-            // Product modal
-            const productModal = document.getElementById('product-modal');
-            const productForm = document.getElementById('product-form');
-            const modalTitle = document.getElementById('modal-title');
-            const productId = document.getElementById('product-id');
-            const productName = document.getElementById('product-name');
-            const productDescription = document.getElementById('product-description');
-            const productImage = document.getElementById('product-image');
-            const currentImageContainer = document.getElementById('current-image-container');
-            const currentImage = document.getElementById('current-image');
-            
-            // Add product button
-            document.getElementById('add-product-btn').addEventListener('click', () => {
-                modalTitle.textContent = 'Add New Product';
-                productId.value = '';
-                productForm.reset();
-                currentImageContainer.classList.add('hidden');
-                productImage.required = true;
-                productModal.classList.remove('hidden');
-            });
-            
-            // Cancel product button
-            document.getElementById('cancel-product').addEventListener('click', () => {
-                productModal.classList.add('hidden');
-            });
-            
-            // Product form submission
-            productForm.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                
-                const formData = new FormData();
-                formData.append('name', productName.value);
-                formData.append('description', productDescription.value);
-                
-                if (productImage.files[0]) {
-                    formData.append('image', productImage.files[0]);
-                }
-                
-                let url = '/api/products';
-                let method = 'POST';
-                
-                if (productId.value) {
-                    url = `/api/products/${productId.value}`;
-                    method = 'PUT';
-                }
-                
-                try {
-                    const response = await fetch(url, {
-                        method,
-                        body: formData,
-                        headers: {
-                            'Authorization': `Bearer ${localStorage.getItem('token')}`
-                        }
-                    });
-                    
-                    const data = await response.json();
-                    
-                    if (data.success) {
-                        productModal.classList.add('hidden');
-                        fetchProducts();
-                    } else if (response.status === 401) {
-                        // Unauthorized - redirect to login
-                        localStorage.removeItem('token');
-                        window.location.href = '/admin/login';
-                    }
-                } catch (error) {
-                    console.error('Error saving product:', error);
-                }
-            });
-            
-            // Delete modal
-            const deleteModal = document.getElementById('delete-modal');
-            let deleteItemId = null;
-            let deleteItemType = null;
-            
-            // Cancel delete button
-            document.getElementById('cancel-delete').addEventListener('click', () => {
-                deleteModal.classList.add('hidden');
-            });
-            
-            // Confirm delete button
-            document.getElementById('confirm-delete').addEventListener('click', async () => {
-                if (!deleteItemId || !deleteItemType) return;
-                
-                let url;
-                if (deleteItemType === 'product') {
-                    url = `/api/products/${deleteItemId}`;
-                } else if (deleteItemType === 'contact') {
-                    url = `/api/contact/${deleteItemId}`;
-                }
-                
-                try {
-                    const response = await fetch(url, {
-                        method: 'DELETE',
-                        headers: {
-                            'Authorization': `Bearer ${localStorage.getItem('token')}`
-                        }
-                    });
-                    
-                    const data = await response.json();
-                    
-                    if (data.success) {
-                        deleteModal.classList.add('hidden');
-                        if (deleteItemType === 'product') {
-                            fetchProducts();
-                        } else if (deleteItemType === 'contact') {
-                            fetchContacts();
-                        }
-                    } else if (response.status === 401) {
-                        // Unauthorized - redirect to login
-                        localStorage.removeItem('token');
-                        window.location.href = '/admin/login';
-                    }
-                } catch (error) {
-                    console.error('Error deleting item:', error);
-                }
-            });
-            
-            // Logout button
-            document.getElementById('logout-btn').addEventListener('click', async () => {
-                try {
-                    await fetch('/api/admin/logout');
-                    localStorage.removeItem('token');
-                    window.location.href = '/admin/login';
-                } catch (error) {
-                    console.error('Error logging out:', error);
-                    // Redirect anyway
-                    localStorage.removeItem('token');
-                    window.location.href = '/admin/login';
-                }
-            });
-            
-            // Fetch products function
-            async function fetchProducts() {
-                try {
-                    const response = await fetch('/api/products');
-                    const data = await response.json();
-                    
-                    if (data.success) {
-                        renderProducts(data.data);
-                    }
-                } catch (error) {
-                    console.error('Error fetching products:', error);
-                }
-            }
-            
-            // Render products function
-            function renderProducts(products) {
-                const productsTable = document.getElementById('products-table');
-                productsTable.innerHTML = '';
-                
-                products.forEach(product => {
-                    const row = document.createElement('tr');
-                    row.innerHTML = `
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <img src="${product.image}" alt="${product.name}" class="h-16 w-16 object-cover rounded">
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="text-sm font-medium text-gray-900">${product.name}</div>
-                        </td>
-                        <td class="px-6 py-4">
-                            <div class="text-sm text-gray-500">${product.description || ''}</div>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                            <button class="text-green-600 hover:text-green-900 mr-3 edit-product" data-id="${product._id}">Edit</button>
-                            <button class="text-red-600 hover:text-red-900 delete-product" data-id="${product._id}">Delete</button>
-                        </td>
-                    `;
-                    productsTable.appendChild(row);
-                });
-                
-                // Add event listeners to edit buttons
-                document.querySelectorAll('.edit-product').forEach(button => {
-                    button.addEventListener('click', async () => {
-                        const id = button.getAttribute('data-id');
-                        try {
-                            const response = await fetch(`/api/products/${id}`);
-                            const data = await response.json();
-                            
-                            if (data.success) {
-                                const product = data.data;
-                                modalTitle.textContent = 'Edit Product';
-                                productId.value = product._id;
-                                productName.value = product.name;
-                                productDescription.value = product.description || '';
-                                currentImage.src = product.image;
-                                currentImageContainer.classList.remove('hidden');
-                                productImage.required = false;
-                                productModal.classList.remove('hidden');
-                            }
-                        } catch (error) {
-                            console.error('Error fetching product details:', error);
-                        }
-                    });
-                });
-                
-                // Add event listeners to delete buttons
-                document.querySelectorAll('.delete-product').forEach(button => {
-                    button.addEventListener('click', () => {
-                        deleteItemId = button.getAttribute('data-id');
-                        deleteItemType = 'product';
-                        deleteModal.classList.remove('hidden');
-                    });
-                });
-            }
-            
-            // Fetch contacts function
-            async function fetchContacts() {
-                try {
-                    const response = await fetch('/api/contact', {
-                        headers: {
-                            'Authorization': `Bearer ${localStorage.getItem('token')}`
-                        }
-                    });
-                    
-                    if (response.status === 401) {
-                        // Unauthorized - redirect to login
-                        localStorage.removeItem('token');
-                        window.location.href = '/admin/login';
-                        return;
-                    }
-                    
-                    const data = await response.json();
-                    
-                    if (data.success) {
-                        renderContacts(data.data);
-                    }
-                } catch (error) {
-                    console.error('Error fetching contacts:', error);
-                }
-            }
-            
-            // Render contacts function
-            function renderContacts(contacts) {
-                const contactsTable = document.getElementById('contacts-table');
-                contactsTable.innerHTML = '';
-                
-                contacts.forEach(contact => {
-                    const row = document.createElement('tr');
-                    row.innerHTML = `
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="text-sm font-medium text-gray-900">${contact.name}</div>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="text-sm text-gray-500">${contact.email}</div>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="text-sm text-gray-500">${contact.phone || ''}</div>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="text-sm text-gray-500">${contact.productName || ''}</div>
-                        </td>
-                        <td class="px-6 py-4">
-                            <div class="text-sm text-gray-500">${contact.message}</div>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                            <button class="text-red-600 hover:text-red-900 delete-contact" data-id="${contact._id}">Delete</button>
-                        </td>
-                    `;
-                    contactsTable.appendChild(row);
-                });
-                
-                // Add event listeners to delete buttons
-                document.querySelectorAll('.delete-contact').forEach(button => {
-                    button.addEventListener('click', () => {
-                        deleteItemId = button.getAttribute('data-id');
-                        deleteItemType = 'contact';
-                        deleteModal.classList.remove('hidden');
-                    });
-                });
-            }
+      document.addEventListener('DOMContentLoaded', () => {
+        // Tab switching
+        const tabProducts = document.getElementById('tab-products');
+        const tabContacts = document.getElementById('tab-contacts');
+        const productsContent = document.getElementById('products-content');
+        const contactsContent = document.getElementById('contacts-content');
+
+        tabProducts.addEventListener('click', () => {
+          productsContent.classList.remove('hidden');
+          contactsContent.classList.add('hidden');
+          tabProducts.classList.add(
+            'text-green-500',
+            'border-b-2',
+            'border-green-500'
+          );
+          tabProducts.classList.remove('text-gray-500', 'hover:text-green-500');
+          tabContacts.classList.add('text-gray-500', 'hover:text-green-500');
+          tabContacts.classList.remove(
+            'text-green-500',
+            'border-b-2',
+            'border-green-500'
+          );
         });
+
+        tabContacts.addEventListener('click', () => {
+          contactsContent.classList.remove('hidden');
+          productsContent.classList.add('hidden');
+          tabContacts.classList.add(
+            'text-green-500',
+            'border-b-2',
+            'border-green-500'
+          );
+          tabContacts.classList.remove('text-gray-500', 'hover:text-green-500');
+          tabProducts.classList.add('text-gray-500', 'hover:text-green-500');
+          tabProducts.classList.remove(
+            'text-green-500',
+            'border-b-2',
+            'border-green-500'
+          );
+
+          // Load contacts when tab is clicked
+          fetchContacts();
+        });
+
+        // Fetch products on page load
+        fetchProducts();
+
+        // Product modal
+        const productModal = document.getElementById('product-modal');
+        const productForm = document.getElementById('product-form');
+        const modalTitle = document.getElementById('modal-title');
+        const productId = document.getElementById('product-id');
+        const productName = document.getElementById('product-name');
+        const productDescription = document.getElementById('product-description');
+        const productImage = document.getElementById('product-image');
+        const currentImageContainer = document.getElementById('current-image-container');
+        const currentImage = document.getElementById('current-image');
+
+        // Add product button
+        document.getElementById('add-product-btn').addEventListener('click', () => {
+          modalTitle.textContent = 'Add New Product';
+          productId.value = '';
+          productForm.reset();
+          currentImageContainer.classList.add('hidden');
+          productImage.required = true;
+          productModal.classList.remove('hidden');
+        });
+
+        // Cancel product button
+        document.getElementById('cancel-product').addEventListener('click', () => {
+          productModal.classList.add('hidden');
+        });
+
+        // Product form submission
+        productForm.addEventListener('submit', async (e) => {
+          e.preventDefault();
+
+          const formData = new FormData();
+          formData.append('name', productName.value);
+          formData.append('description', productDescription.value);
+
+          if (productImage.files[0]) {
+            formData.append('image', productImage.files[0]);
+          }
+
+          let url = '/api/products';
+          let method = 'POST';
+
+          if (productId.value) {
+            url = `/api/products/${productId.value}`;
+            method = 'PUT';
+          }
+
+          try {
+            const response = await fetch(url, {
+              method,
+              body: formData,
+              headers: {
+                Authorization: `Bearer ${localStorage.getItem('token')}`,
+              },
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+              productModal.classList.add('hidden');
+              fetchProducts();
+            } else if (response.status === 401) {
+              // Unauthorized - redirect to login
+              localStorage.removeItem('token');
+              window.location.href = '/admin/login';
+            }
+          } catch (error) {
+            console.error('Error saving product:', error);
+          }
+        });
+
+        // Delete modal
+        const deleteModal = document.getElementById('delete-modal');
+        let deleteItemId = null;
+        let deleteItemType = null;
+
+        // Cancel delete button
+        document.getElementById('cancel-delete').addEventListener('click', () => {
+          deleteModal.classList.add('hidden');
+        });
+
+        // Confirm delete button
+        document.getElementById('confirm-delete').addEventListener('click', async () => {
+          if (!deleteItemId || !deleteItemType) return;
+
+          let url;
+          if (deleteItemType === 'product') {
+            url = `/api/products/${deleteItemId}`;
+          } else if (deleteItemType === 'contact') {
+            url = `/api/contact/${deleteItemId}`;
+          }
+
+          try {
+            const response = await fetch(url, {
+              method: 'DELETE',
+              headers: {
+                Authorization: `Bearer ${localStorage.getItem('token')}`,
+              },
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+              deleteModal.classList.add('hidden');
+              if (deleteItemType === 'product') {
+                fetchProducts();
+              } else if (deleteItemType === 'contact') {
+                fetchContacts();
+              }
+            } else if (response.status === 401) {
+              // Unauthorized - redirect to login
+              localStorage.removeItem('token');
+              window.location.href = '/admin/login';
+            }
+          } catch (error) {
+            console.error('Error deleting item:', error);
+          }
+        });
+
+        // Logout button
+        document.getElementById('logout-btn').addEventListener('click', async () => {
+          try {
+            await fetch('/api/admin/logout');
+            localStorage.removeItem('token');
+            window.location.href = '/admin/login';
+          } catch (error) {
+            console.error('Error logging out:', error);
+            // Redirect anyway
+            localStorage.removeItem('token');
+            window.location.href = '/admin/login';
+          }
+        });
+
+        // Fetch products function
+        async function fetchProducts() {
+          try {
+            const response = await fetch('/api/products');
+            const data = await response.json();
+
+            if (data.success) {
+              renderProducts(data.data);
+            }
+          } catch (error) {
+            console.error('Error fetching products:', error);
+          }
+        }
+
+        // Render products function
+        function renderProducts(products) {
+          const productsTable = document.getElementById('products-table');
+          productsTable.innerHTML = '';
+
+          products.forEach((product) => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td class="px-6 py-4 whitespace-nowrap">
+                    <img src="${product.image}" alt="${product.name}" class="h-16 w-16 object-cover rounded">
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="text-sm font-medium text-gray-900">${product.name}</div>
+                </td>
+                <td class="px-6 py-4">
+                    <div class="text-sm text-gray-500">${product.description || ''}</div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                    <button class="text-green-600 hover:text-green-900 mr-3 edit-product" data-id="${product._id}">Edit</button>
+                    <button class="text-red-600 hover:text-red-900 delete-product" data-id="${product._id}">Delete</button>
+                </td>
+            `;
+            productsTable.appendChild(row);
+          });
+
+          // Add event listeners to edit buttons
+          document.querySelectorAll('.edit-product').forEach((button) => {
+            button.addEventListener('click', async () => {
+              const id = button.getAttribute('data-id');
+              try {
+                const response = await fetch(`/api/products/${id}`);
+                const data = await response.json();
+
+                if (data.success) {
+                  const product = data.data;
+                  modalTitle.textContent = 'Edit Product';
+                  productId.value = product._id;
+                  productName.value = product.name;
+                  productDescription.value = product.description || '';
+                  currentImage.src = product.image;
+                  currentImageContainer.classList.remove('hidden');
+                  productImage.required = false;
+                  productModal.classList.remove('hidden');
+                }
+              } catch (error) {
+                console.error('Error fetching product details:', error);
+              }
+            });
+          });
+
+          // Add event listeners to delete buttons
+          document.querySelectorAll('.delete-product').forEach((button) => {
+            button.addEventListener('click', () => {
+              deleteItemId = button.getAttribute('data-id');
+              deleteItemType = 'product';
+              deleteModal.classList.remove('hidden');
+            });
+          });
+        }
+
+        // Fetch contacts function
+        async function fetchContacts() {
+          try {
+            const response = await fetch('/api/contact', {
+              headers: {
+                Authorization: `Bearer ${localStorage.getItem('token')}`,
+              },
+            });
+
+            if (response.status === 401) {
+              // Unauthorized - redirect to login
+              localStorage.removeItem('token');
+              window.location.href = '/admin/login';
+              return;
+            }
+
+            const data = await response.json();
+
+            if (data.success) {
+              renderContacts(data.data);
+            }
+          } catch (error) {
+            console.error('Error fetching contacts:', error);
+          }
+        }
+
+        // Render contacts function
+        function renderContacts(contacts) {
+          const contactsTable = document.getElementById('contacts-table');
+          contactsTable.innerHTML = '';
+
+          contacts.forEach((contact) => {
+            const row = document.createElement('tr');
+            
+            // Format product names
+            let productDisplay = 'N/A';
+            if (contact.productNames && contact.productNames.length > 0) {
+              productDisplay = contact.productNames.join(', ');
+            }
+            
+            row.innerHTML = `
+                <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="text-sm font-medium text-gray-900">${contact.name}</div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="text-sm text-gray-500">${contact.email}</div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="text-sm text-gray-500">${contact.phone || ''}</div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="text-sm text-gray-500">${productDisplay}</div>
+                </td>
+                <td class="px-6 py-4">
+                    <div class="text-sm text-gray-500">${contact.message || ''}</div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                    <button class="text-red-600 hover:text-red-900 delete-contact" data-id="${contact._id}">Delete</button>
+                </td>
+            `;
+            contactsTable.appendChild(row);
+          });
+
+          // Add event listeners to delete buttons
+          document.querySelectorAll('.delete-contact').forEach((button) => {
+            button.addEventListener('click', () => {
+              deleteItemId = button.getAttribute('data-id');
+              deleteItemType = 'contact';
+              deleteModal.classList.remove('hidden');
+            });
+          });
+        }
+      });
     </script>
 </body>
 </html>

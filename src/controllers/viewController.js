@@ -1,4 +1,5 @@
 const productService = require('../services/productService');
+const contactService = require('../services/contactService');
 
 /**
  * View Controller - Handles rendering views for the frontend
@@ -12,7 +13,8 @@ class ViewController {
   async renderHome(req, res) {
     try {
       res.render('index', {
-        title: 'Mica - Home'
+        title: 'Mica - Home',
+        path: '/'
       });
     } catch (error) {
       console.error('Error rendering home page:', error);
@@ -28,9 +30,12 @@ class ViewController {
   async renderProducts(req, res) {
     try {
       const products = await productService.getAllProducts();
+      console.log('Products fetched for rendering:', products);
+      
       res.render('products', {
         title: 'Mica - Products',
-        products
+        path: '/products',
+        products: products || []
       });
     } catch (error) {
       console.error('Error rendering products page:', error);
@@ -46,7 +51,8 @@ class ViewController {
   async renderContact(req, res) {
     try {
       res.render('contact', {
-        title: 'Mica - Contact'
+        title: 'Mica - Contact',
+        path: '/contact'
       });
     } catch (error) {
       console.error('Error rendering contact page:', error);
@@ -61,9 +67,12 @@ class ViewController {
    */
   async renderAdminDashboard(req, res) {
     try {
-      // Skip authentication check for now - we'll handle it client-side
+      // Get contacts for the dashboard
+      const contacts = await contactService.getAllContacts();
+      
       res.render('admin/dashboard', {
-        title: 'Mica - Admin Dashboard'
+        title: 'Mica - Admin Dashboard',
+        contacts: contacts || []
       });
     } catch (error) {
       console.error('Error rendering admin dashboard:', error);
