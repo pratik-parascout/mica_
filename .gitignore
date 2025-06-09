@@ -5,3 +5,4 @@ npm-debug.log
 yarn-error.log
 public/uploads/*
 !public/uploads/.gitkeep
+create-admin.js
